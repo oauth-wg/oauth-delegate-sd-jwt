@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Delegate SD-JWT</title>
+<meta content="Gareth Oliver" name="author">
+<meta content="Christian Bormann" name="author">
+<meta content="
+       This document specifies an extension to Selective Disclosure JSON Web Tokens   to support further delegation from the Holder to a Delegate Holder. This is done by allowing the Key Binding JWT to also be an SD-JWT, optionally with its own Key Binding. This has particular applicability to Agentic systems. 
+    " name="description">
+<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="sd-jwt" name="keyword">
+<meta content="delegate sd-jwt" name="keyword">
+<meta content="draft-ietf-oauth-delegate-sd-jwt-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.13.4
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.9.2
+-->
+<link href="draft-ietf-oauth-delegate-sd-jwt.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Delegate SD-JWT</td>
+<td class="right">October 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Oliver &amp; Bormann</td>
+<td class="center">Expires 29 April 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Web Authorization Protocol</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ietf-oauth-delegate-sd-jwt-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-10-26" class="published">26 October 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-04-29">29 April 2027</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">G. Oliver</div>
+<div class="org">Google</div>
+</div>
+<div class="author">
+      <div class="author-name">C. Bormann</div>
+<div class="org">SPRIND</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Delegate SD-JWT</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document specifies an extension to Selective Disclosure JSON Web Tokens <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> to support further delegation from the Holder to a Delegate Holder. This is done by allowing the Key Binding JWT to also be an SD-JWT, optionally with its own Key Binding. This has particular applicability to Agentic systems.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 29 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-feature-summary" class="internal xref">Feature Summary</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-requirements-notation-and-c" class="internal xref">Requirements Notation and Conventions</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-terms-and-definitions" class="internal xref">Terms and Definitions</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-flow-diagram" class="internal xref">Flow Diagram</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-concepts" class="internal xref">Concepts</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-selective-disclosure" class="internal xref">Selective Disclosure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-optional-key-binding" class="internal xref">Optional Key Binding</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-verification" class="internal xref">Verification</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-formats" class="internal xref">Formats</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-dsd-jwt-and-dsd-jwtkb-data-" class="internal xref">dSD-JWT and dSD-JWT+KB Data Formats</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.1">
+                    <p id="section-toc.1-1.5.2.1.2.1.1"><a href="#section-5.1.1" class="auto internal xref">5.1.1</a>.  <a href="#name-compact-serialization" class="internal xref">Compact Serialization</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.2">
+                    <p id="section-toc.1-1.5.2.1.2.2.1"><a href="#section-5.1.2" class="auto internal xref">5.1.2</a>.  <a href="#name-json-serialization" class="internal xref">JSON Serialization</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.3">
+                    <p id="section-toc.1-1.5.2.1.2.3.1"><a href="#section-5.1.3" class="auto internal xref">5.1.3</a>.  <a href="#name-delegate-payload-disclosure" class="internal xref">Delegate Payload Disclosure</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.4">
+                    <p id="section-toc.1-1.5.2.1.2.4.1"><a href="#section-5.1.4" class="auto internal xref">5.1.4</a>.  <a href="#name-kb-sd-jwt-and-kb-sd-jwtkb" class="internal xref">KB-SD-JWT and KB-SD-JWT+KB</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-verification-2" class="internal xref">Verification</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-delegation-using-presentati" class="internal xref">Delegation using Presentation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-dsd-jwt-delegation-using-op" class="internal xref">dSD-JWT Delegation using OpenID4VP</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-mandatory-verification-of-d" class="internal xref">Mandatory verification of delegate SD-JWT Chain</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-delegation-policy" class="internal xref">Delegation Policy</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-delegate-sd-jwt-revocation" class="internal xref">Delegate SD-JWT Revocation</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-json-web-token-claims-regis" class="internal xref">JSON Web Token Claims Registration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-media-type-registration" class="internal xref">Media Type Registration</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">This is an extension to SD-JWTs <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span>, to allow for the creation and delegation of new credentials using an existing SD-JWT+KB.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">SD-JWT provides a mechanism for ensuring minimal disclosure in a three party model. This allows an intermediary party (the Holder) to choose to remove claims when only a subset is needed by a verifier. Additionally SD-JWT+KB allows for proof of possession by the Holder using the <code>cnf</code> claim. The Verifier need only trust the Issuer and its policy regarding the <code>cnf</code> key to trust the resulting presentation.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This is achieved using a composite structure of an Issuer-Signed JWT containing salted hashes and associated optional disclosures that can be omitted by the Holder. An optional KB-JWT containing transaction-specific data and signed by the private key <code>cnf</code> key is used to provide cryptographic key binding.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">While it is possible for a Verifier to forward and further down-scope a SD-JWT, it is not able to prove that it was the recipient of the original SD-JWT+KB presentation, nor is it able to downscope parts of the transaction data, which may be relevant for privacy reasons.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">This capability is useful for a ‘delegation’ model, where the Holder delegates further presentations of the SD-JWT+KB to a Delegate Holder. Additionally, the Holder should be able to provide additional (optionally disclosable) claims as part of the Delegation.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">One example use-case is to delegate to an AI agent the ability to perform purchases on the user's behalf, along with constraints on valid fulfillment conditions. The AI Agent can then prove to a merchant that it has been authorized to perform a purchase at this merchant on the Holder's behalf, without revealing what other merchants may have been able to fulfill this purchase.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">The approach taken here is to extend the KB-JWT so that it can be used as the start of a new SD-JWT or SD-JWT+KB, linking the resulting SD-JWT to the original one.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<div id="feature-summary">
+<section id="section-1.1">
+        <h3 id="name-feature-summary">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-feature-summary" class="section-name selfRef">Feature Summary</a>
+        </h3>
+<p id="section-1.1-1">This specification defines extensions to the SD-JWT and SD-JWT+KB formats:<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-1.1-2">
+<li id="section-1.1-2.1">
+            <p id="section-1.1-2.1.1">dSD-JWT which is a composite structure consisting of an SD-JWT and a Key Binding SD-JWT. The KB-SD-JWT signs over a delegate JSON Payload with zero or more disclosures.<a href="#section-1.1-2.1.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-1.1-2.1.2.1">This includes an alternative format for a KB-JWT (called a KB-SD-JWT) to secure a nested, selectively disclosable JSON object. This is achieved by making the KB-JWT an SD-JWT.<a href="#section-1.1-2.1.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="section-1.1-2.1.2.2">A format for extending the SD-JWT+KB Compact Serialization to include a KB-SD-JWT.<a href="#section-1.1-2.1.2.2" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="section-1.1-2.1.2.3">An alternative format to do the same for the SD-JWT JSON Serialization format.<a href="#section-1.1-2.1.2.3" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+          <li id="section-1.1-2.2">
+            <p id="section-1.1-2.2.1">dSD-JWT+KB which extends dSD-JWT to include Key Binding, allowing the Delegate Holder to demonstrate proof of possession.<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-1.1-2.2.2.1">This re-uses the KB-JWT mechanism specified by SD-JWT+KB for associating and presenting a proof of possession of a key pair.<a href="#section-1.1-2.2.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="section-1.1-2.2.2.2">This also allows for further delegation of the dSD-JWT+KB with the use of additional KB-SD-JWTs.<a href="#section-1.1-2.2.2.2" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+        </ol>
+</section>
+</div>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<div id="requirements-notation-and-conventions">
+<section id="section-2.1">
+        <h3 id="name-requirements-notation-and-c">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-requirements-notation-and-c" class="section-name selfRef">Requirements Notation and Conventions</a>
+        </h3>
+<p id="section-2.1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in RFC 2119 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terms-and-definitions">
+<section id="section-2.2">
+        <h3 id="name-terms-and-definitions">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-terms-and-definitions" class="section-name selfRef">Terms and Definitions</a>
+        </h3>
+<p id="section-2.2-1">This specification uses the terms "Disclosure", "Selectively Disclosable JWT (SD-JWT)", "Key Binding",
+"Key Binding JWT (KB-JWT)", "Selectively Disclosable JWT with Key Binding (SD-JWT+KB)" defined by
+<span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span>.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<p id="section-2.2-2"><em>Delegated SD-JWT(dSD-JWT)</em>: A composite structure consisting of an SD-JWT and a Key Binding SD-JWT (KB-SD-JWT). It acts as a chain of SD-JWTs where the Key Binding of the previous SD-JWT is used to sign the new one, allowing the Verifier to link presentations back to the initial Issuer.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
+<p id="section-2.2-3"><em>Delegated SD-JWT with Key Binding (dSD-JWT+KB)</em>: An extension of the dSD-JWT that includes a final Key Binding JWT (KB-JWT). This allows the Delegate Holder to demonstrate proof of possession of the dSD-JWT.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+<p id="section-2.2-4"><em>Key Binding SD-JWT (KB-SD-JWT)</em>: An alternative format for a KB-JWT used to secure a nested, selectively disclosable JSON object (the Delegate Payload). It serves as the KB-JWT for the preceding SD-JWT in a chain.<a href="#section-2.2-4" class="pilcrow">¶</a></p>
+<p id="section-2.2-5"><em>Key Binding SD-JWT+KB (KB-SD-JWT+KB)</em>: A specific type of KB-SD-JWT where the <code>typ</code> parameter is set to "kb-sd-jwt+kb". This type requires the Delegate Payload to include a <code>cnf</code> claim.<a href="#section-2.2-5" class="pilcrow">¶</a></p>
+<p id="section-2.2-6"><em>Delegate Payload</em>: A JSON object (which may be nested and selectively disclosable) over which the KB-SD-JWT signs. In a dSD-JWT+KB, this payload MUST include a <code>cnf</code> claim to establish the Delegate Holder's key.<a href="#section-2.2-6" class="pilcrow">¶</a></p>
+<p id="section-2.2-7"><em>Issuer</em>: An entity that creates the initial SD-JWT.<a href="#section-2.2-7" class="pilcrow">¶</a></p>
+<p id="section-2.2-8"><em>Holder</em>: An entity that receives the initial SD-JWT from the Issuer and has control of it. They may present the SD-JWT to a Verifier directly or delegate it to a Delegate Holder.<a href="#section-2.2-8" class="pilcrow">¶</a></p>
+<p id="section-2.2-9"><em>Delegate Holder</em>: An intermediary entity to whom the original Holder delegates the SD-JWT. The Delegate Holder can perform further presentations or delegations of the SD-JWT.<a href="#section-2.2-9" class="pilcrow">¶</a></p>
+<p id="section-2.2-10"><em>Verifier</em>: An entity that requests, checks and extracts the claims of the SD-JWT or dSD-JWT.<a href="#section-2.2-10" class="pilcrow">¶</a></p>
+<p id="section-2.2-11"><em>Delegation</em>: Delegation in this document refers to a Holder or Delegate Holder presenting a credential to a Delegate Holder for the purpose of further presentation.<a href="#section-2.2-11" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="flow-diagram">
+<section id="section-3">
+      <h2 id="name-flow-diagram">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-flow-diagram" class="section-name selfRef">Flow Diagram</a>
+      </h2>
+<span id="name-delegate-sd-jwt-issuance-de"></span><figure id="figure-1">
+        <div class="lang-ascii-art sourcecode" id="section-3-1.1">
+<pre>+----------------------------------------+
+|                                        |
+|                Issuer                  |
+|                                        |
++----------------------------------------+
+                  |
+          Issues SD-JWT+KB and
+             all Disclosures
+                  |
+                  v
++----------------------------------------+
+|                                        |
+|                Holder                  |
+|                                        |
++----------------------------------------+
+                  |
+          Delegates SD-JWT+KB,
+        selected Disclosures and
+          Payload to create a
+         dSD-JWT or dSD-JWT+KB,
+      including all new disclosures
+                  |
+                  v
++----------------------------------------+
+|                                        |
+|         Delegate Holder(s)             |
+|                                        |
++--+-------------------------------------+
+   |   |          |
+   +---+---+-----------------------------+
+       |          |
+       +---+-----------------------------+
+                  |
+           Presents dSD-JWT or
+        dSD-JWT+KB and selected
+            Disclosures
+                  |
+                  v
++----------------------------------------+
+|                                        |
+|              Verifier(s)               |
+|                                        |
++--+-------------------------------------+
+   |   |   |
+   +---+---+-----------------------------+
+       |   |
+       +---+-----------------------------+
+
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-delegate-sd-jwt-issuance-de" class="selfRef">Delegate SD-JWT Issuance, Delegation and Presentation.</a>
+        </figcaption></figure>
+</section>
+</div>
+<div id="concepts">
+<section id="section-4">
+      <h2 id="name-concepts">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-concepts" class="section-name selfRef">Concepts</a>
+      </h2>
+<p id="section-4-1">At a high level, a dSD-JWT acts as a chain of SD-JWTs where the KB-JWT in the preceding SD-JWT+KB fulfills the role of the Issuer-JWT for the next. This allows the Verifier to know the full chain that the dSD-JWT went through and link the presentations back to the initial Issuer while preserving the principles of Data Minimization.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div id="selective-disclosure">
+<section id="section-4.1">
+        <h3 id="name-selective-disclosure">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-selective-disclosure" class="section-name selfRef">Selective Disclosure</a>
+        </h3>
+<p id="section-4.1-1">An dSD-JWT has two different sets of Selective Disclosures:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-4.1-2.1">Selective Disclosures from the original SD-JWT<a href="#section-4.1-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-4.1-2.2">Selective Disclosures from the new Delegate Payload<a href="#section-4.1-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-4.1-3">A Delegate Holder may always choose to include or omit selective disclosures from the Delegate Payload. If the Holder wishes to allow the Delegate Holder to omit selective disclosures from the preceding SD-JWT it MUST omit the <code>sd_hash</code> claim from the KB-JWT and include the <code>issuer_jwt_hash</code> claim instead.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="optional-key-binding">
+<section id="section-4.2">
+        <h3 id="name-optional-key-binding">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-optional-key-binding" class="section-name selfRef">Optional Key Binding</a>
+        </h3>
+<p id="section-4.2-1">Key Binding is required for the initial SD-JWTs and all KB-SD-JWTs except the final one. It is optional for Key Binding to be used for the final KB-SD-JWT. When it is used, the Delegate Holder’s public key information is included in the Delegate Payload of the final KB-SD-JWT. This allows the Delegate Holder to create a KB-JWT in future presentations using the private key associated with the included public key, demonstrating proof of possession.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="verification">
+<section id="section-4.3">
+        <h3 id="name-verification">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-verification" class="section-name selfRef">Verification</a>
+        </h3>
+<p id="section-4.3-1">At a high level verification works as follows:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-4.3-2.1">The Verifier receives a dSD-JWT or dSD-JWT+KB from the Delegate Holder.<a href="#section-4.3-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-4.3-2.2">The Verifier splits the dSD-JWT into a chain with an SD-JWT, one or more KB-SD-JWT and (in the case of a dSD-JWT+KB) a final KB-JWT.<a href="#section-4.3-2.2" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-4.3-2.3">The Verifier verifies the first SD-JWT+KB using the Issuer key, using the KB-SD-JWT that immediately follows it as the KB-JWT.<a href="#section-4.3-2.3" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-4.3-2.4">For each KB-SD-JWT, the Verifier verifies it as an SD-JWT+KB, treating the Delegate Payload as the JWT payload. The key from the <code>cnf</code> claim of the previous SD-JWT is used.<a href="#section-4.3-2.4" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-4.3-2.5">If required by policy, the final KB-SD-JWT MUST also be validated as an SD-JWT+KB, along with the transaction binding data included there.<a href="#section-4.3-2.5" class="pilcrow">¶</a>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="formats">
+<section id="section-5">
+      <h2 id="name-formats">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-formats" class="section-name selfRef">Formats</a>
+      </h2>
+<div id="dsd-jwt-and-dsd-jwt-kb-data-formats">
+<section id="section-5.1">
+        <h3 id="name-dsd-jwt-and-dsd-jwtkb-data-">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-dsd-jwt-and-dsd-jwtkb-data-" class="section-name selfRef">dSD-JWT and dSD-JWT+KB Data Formats</a>
+        </h3>
+<p id="section-5.1-1">A dSD-JWT with a single delegation is composed of:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1-2.1">
+            <p id="section-5.1-2.1.1">A SD-JWT<a href="#section-5.1-2.1.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1-2.1.2.1">i.e. An issuer-signed JWT<a href="#section-5.1-2.1.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="section-5.1-2.1.2.2">zero or more disclosures<a href="#section-5.1-2.1.2.2" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+          <li class="compact" id="section-5.1-2.2">
+            <p id="section-5.1-2.2.1">A KB-SD-JWT<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1-2.2.2.1">Serves as the KB-JWT for the preceding SD-JWT<a href="#section-5.1-2.2.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="section-5.1-2.2.2.2">This is also the SD-JWT containing the Delegated Payload.<a href="#section-5.1-2.2.2.2" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+        </ul>
+<p id="section-5.1-3">A dSD-JWT+KB with a single delegation is composed of:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1-4.1">A dSD-JWT whose KB-SD-JWT is a KB-SD-JWT+KB<a href="#section-5.1-4.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-5.1-4.2">A KB-JWT<a href="#section-5.1-4.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-5.1-5">A dSD-JWT or dSD-JWT+KB with multiple delegations is composed of:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1-6.1">A SD-JWT<a href="#section-5.1-6.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-5.1-6.2">Two or more KB-SD-JWTs<a href="#section-5.1-6.2" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-5.1-6.3">When the format is dSD-JWT+KB, a KB-JWT.<a href="#section-5.1-6.3" class="pilcrow">¶</a>
+</li>
+        </ul>
+<div id="compact-serialization">
+<section id="section-5.1.1">
+          <h4 id="name-compact-serialization">
+<a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-compact-serialization" class="section-name selfRef">Compact Serialization</a>
+          </h4>
+<p id="section-5.1.1-1">The dSD-JWT format extends the SD-JWT format defined in <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 4 by appending a tilde character followed by a KB-SD-JWT:<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
+<div class="lang-example sourcecode" id="section-5.1.1-2">
+<pre>&lt;SD-JWT&gt;~~&lt;KB-JWT&gt;~&lt;Delegated Disclosure 1&gt;~...~&lt;Delegated Disclosure M&gt;~
+
+</pre><a href="#section-5.1.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1.1-3">The &lt;KB-JWT&gt; along with its disclosures is called a KB-SD-JWT. In the examples in this section, &lt;SD-JWT&gt; and &lt;KB-SD-JWT&gt; denote the respective structure without its trailing tilde character.<a href="#section-5.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1.1-4">The dSD-JWT+KB format further extends the dSD-JWT format by appending a delegate KB-JWT:<a href="#section-5.1.1-4" class="pilcrow">¶</a></p>
+<div class="lang-example sourcecode" id="section-5.1.1-5">
+<pre>&lt;SD-JWT&gt;~~&lt;KB-SD-JWT&gt;~&lt;delegate KB-JWT&gt;
+
+</pre><a href="#section-5.1.1-5" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1.1-6">This can be chained by replacing the KB-JWT with another KB-SD-JWT instead:<a href="#section-5.1.1-6" class="pilcrow">¶</a></p>
+<div class="lang-example sourcecode" id="section-5.1.1-7">
+<pre>&lt;SD-JWT&gt;~~&lt;KB-SD-JWT 1&gt;~~...~~&lt;KB-SD-JWT n&gt;~&lt;delegate KB-JWT&gt;
+
+</pre><a href="#section-5.1.1-7" class="pilcrow">¶</a>
+</div>
+<p id="section-5.1.1-8">To process a dSD-JWT or a dSD-JWT+KB, the string is split on ~ as usual. The resulting array of components MUST have exactly one empty component between the last component of each SD-JWT or KB-SD-JWT and the following KB-SD-JWT. The following KB-SD-JWT is then used as the KB-JWT for the preceding SD-JWT.<a href="#section-5.1.1-8" class="pilcrow">¶</a></p>
+<p id="section-5.1.1-9">dSD-JWT+KB and dSD-JWT formats are differentiated by a trailing ~ for dSD-JWT.<a href="#section-5.1.1-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="json-serialization">
+<section id="section-5.1.2">
+          <h4 id="name-json-serialization">
+<a href="#section-5.1.2" class="section-number selfRef">5.1.2. </a><a href="#name-json-serialization" class="section-name selfRef">JSON Serialization</a>
+          </h4>
+<p id="section-5.1.2-1">For both the General and Flattened JSON Serialization, the dSD-JWT or dSD-JWT+KB is represented as a JSON object. The only change in encoding is to the format of the <code>kb_jwt</code> unprotected header parameter (<span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 8.1), whose value now MUST conform to the General or Flattened JSON Serialization of an SD-JWT. The <code>sd_hash</code> and <code>issuer_jwt_hash</code> digests MUST be computed over the equivalent Compact Serialization as defined in <span><a href="https://rfc-editor.org/rfc/rfc9901#section-8.1" class="relref">Section 8.1</a> of [<a href="#RFC9901" class="cite xref">RFC9901</a>]</span>.<a href="#section-5.1.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="delegate-payload-disclosure">
+<section id="section-5.1.3">
+          <h4 id="name-delegate-payload-disclosure">
+<a href="#section-5.1.3" class="section-number selfRef">5.1.3. </a><a href="#name-delegate-payload-disclosure" class="section-name selfRef">Delegate Payload Disclosure</a>
+          </h4>
+<p id="section-5.1.3-1">The delegate payload disclosure is an Array disclosure, which is the base64url encoding of <code>[salt, JSON Object Payload]</code>.<a href="#section-5.1.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.1.3-2">The Disclosure Payload MUST follow all rules for the payload of the Issuer-signed JWT specified in <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 4.1.<a href="#section-5.1.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.1.3-3">The Delegate Disclosures are created as per <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 4.2.<a href="#section-5.1.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.1.3-4">The Delegate KB-JWT is a KB-JWT as per <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 4.3 except that the REQUIRED <code>sd_hash</code> is calculated over the preceding KB-SD-JWT and its associated disclosures.<a href="#section-5.1.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="kb-sd-jwt">
+<section id="section-5.1.4">
+          <h4 id="name-kb-sd-jwt-and-kb-sd-jwtkb">
+<a href="#section-5.1.4" class="section-number selfRef">5.1.4. </a><a href="#name-kb-sd-jwt-and-kb-sd-jwtkb" class="section-name selfRef">KB-SD-JWT and KB-SD-JWT+KB</a>
+          </h4>
+<p id="section-5.1.4-1">This specifies two new extensions to the KB-JWT. The following additional claims are included:<a href="#section-5.1.4-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1.4-2.1">
+              <p id="section-5.1.4-2.1.1">“*delegate_payload*”: An array of JSON Objects. If it contains more than one element then they MUST all be replaced with disclosures. During the presentation of a dSD-JWT from a Delegate Holder to a Verifier exactly one of these MUST be disclosed.<a href="#section-5.1.4-2.1.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1.4-2.1.2.1">When presenting from a Holder to a new Delegate Holder, multiple values being present allows for multiple dSD-JWTs to be delegated with a single signature which may be convenient when using a signing key that requires a user action per signing event.<a href="#section-5.1.4-2.1.2.1" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+          </ul>
+<p id="section-5.1.4-3">KB-SD-JWTs MUST conform to all the requirements of a KB-JWT and an SD-JWT except as listed below:<a href="#section-5.1.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.1.4-4">KB-JWT changes:<a href="#section-5.1.4-4" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1.4-5.1">
+              <p id="section-5.1.4-5.1.1">The <code>typ</code> parameter value MUST be replaced with "kb+sd-jwt" for a KB-SD-JWT, and "kb-sd-jwt+kb" for a KB-SD-JWT+KB.<a href="#section-5.1.4-5.1.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1.4-5.1.2.1">If the <code>typ</code> is KB-SD-JWT+KB then the Delegate Payload MUST include a <code>cnf</code> claim.<a href="#section-5.1.4-5.1.2.1" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li class="compact" id="section-5.1.4-5.2">The <code>sd_hash</code> parameter is OPTIONAL. If it is not present it MUST instead include a <code>issuer_jwt_hash</code> parameter that hashes over only the preceding Issuer-signed jwt or KB-SD-JWT+KB and not any disclosures.<a href="#section-5.1.4-5.2" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-5.1.4-6">When present, the <code>sd_hash</code> is calculated over the preceding SD-JWT or KB-SD-JWT, including its disclosures, as described in <a href="https://rfc-editor.org/rfc/rfc9901#appendix-Section%204.3.1" class="relref">Section 4.3.1</a>. Both <code>sd_hash</code> and <code>issuer_jwt_hash</code> use the hash algorithm of the preceding Issuer-signed JWT or KB-SD-JWT+KB, as defined in <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 4.3.1.<a href="#section-5.1.4-6" class="pilcrow">¶</a></p>
+<p id="section-5.1.4-7">SD-JWT changes:<a href="#section-5.1.4-7" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-5.1.4-8.1">All claims that are expected to be found in the issuer-signed JWT Payload except the <code>_sd_alg</code> claim MUST instead be claims in the Delegate Payload.<a href="#section-5.1.4-8.1" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="verification-1">
+<section id="section-6">
+      <h2 id="name-verification-2">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-verification-2" class="section-name selfRef">Verification</a>
+      </h2>
+<p id="section-6-1">To perform verification of an dSD-JWT or dSD-JWT+KB the following steps must be followed.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-6-2">
+<li id="section-6-2.1">
+          <p id="section-6-2.1.1">Split the dSD-JWT into its component SD-JWTs<a href="#section-6-2.1.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-6-2.1.2">
+<li id="section-6-2.1.2.1">
+              <p id="section-6-2.1.2.1.1">For a dSD-JWT this will be:<a href="#section-6-2.1.2.1.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-6-2.1.2.1.2.1">A SD-JWT<a href="#section-6-2.1.2.1.2.1" class="pilcrow">¶</a>
+</li>
+                <li class="compact" id="section-6-2.1.2.1.2.2">zero or more KB-SD-JWTs with <code>typ</code> "kb-sd-jwt+kb"<a href="#section-6-2.1.2.1.2.2" class="pilcrow">¶</a>
+</li>
+                <li class="compact" id="section-6-2.1.2.1.2.3">one KB-SD-JWT with <code>typ</code> "kb+sd-jwt" or "kb-sd-jwt+kb"<a href="#section-6-2.1.2.1.2.3" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li id="section-6-2.1.2.2">
+              <p id="section-6-2.1.2.2.1">For a dSD-JWT+KB this will be:<a href="#section-6-2.1.2.2.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-6-2.1.2.2.2.1">A SD-JWT<a href="#section-6-2.1.2.2.2.1" class="pilcrow">¶</a>
+</li>
+                <li class="compact" id="section-6-2.1.2.2.2.2">One or  more KB-SD-JWTs with <code>typ</code> "kb-sd-jwt+kb"<a href="#section-6-2.1.2.2.2.2" class="pilcrow">¶</a>
+</li>
+                <li class="compact" id="section-6-2.1.2.2.2.3">One KB-JWT<a href="#section-6-2.1.2.2.2.3" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+          </ol>
+</li>
+        <li id="section-6-2.2">Validate and process the initial SD-JWT according to <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 7.1.<a href="#section-6-2.2" class="pilcrow">¶</a>
+</li>
+        <li id="section-6-2.3">
+          <p id="section-6-2.3.1">For each KB-SD-JWT except the final one:<a href="#section-6-2.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-6-2.3.2">
+<li id="section-6-2.3.2.1">
+              <p id="section-6-2.3.2.1.1">Validate and process it according to <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 7.1<a href="#section-6-2.3.2.1.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-6-2.3.2.1.2.1">The <code>cnf</code> claim of the preceding component is used as the Issuer public key.<a href="#section-6-2.3.2.1.2.1" class="pilcrow">¶</a>
+</li>
+                <li class="compact" id="section-6-2.3.2.1.2.2">Treat the Delegate Payload as the JWT Payload for finding all claims other than the <code>_sd_alg</code> claim.<a href="#section-6-2.3.2.1.2.2" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li id="section-6-2.3.2.2">Verify that there is exactly one disclosed element in the <code>delegate_payload</code> array.<a href="#section-6-2.3.2.2" class="pilcrow">¶</a>
+</li>
+            <li id="section-6-2.3.2.3">If the <code>sd_hash</code> claim is present, calculate the digest over the preceding SD-JWT or KB-SD-JWT and its disclosures, as described in <a href="https://rfc-editor.org/rfc/rfc9901#appendix-Section%204.3.1" class="relref">Section 4.3.1</a>, and verify that it matches the value of the <code>sd_hash</code> claim.<a href="#section-6-2.3.2.3" class="pilcrow">¶</a>
+</li>
+            <li id="section-6-2.3.2.4">Otherwise, verify that the <code>issuer_jwt_hash</code> is present and matches the base64url encoded digest of the preceding Issuer-signed JWT or KB-SD-JWT+KB.<a href="#section-6-2.3.2.4" class="pilcrow">¶</a>
+</li>
+            <li id="section-6-2.3.2.5">Verify the <code>typ</code> in the JOSE header is "kb-sd-jwt+kb"<a href="#section-6-2.3.2.5" class="pilcrow">¶</a>
+</li>
+          </ol>
+</li>
+        <li id="section-6-2.4">
+          <p id="section-6-2.4.1">For the final KB-SD-JWT:<a href="#section-6-2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-6-2.4.2">
+<li id="section-6-2.4.2.1">Validate and process it according to 3.1 - 3.4<a href="#section-6-2.4.2.1" class="pilcrow">¶</a>
+</li>
+            <li id="section-6-2.4.2.2">If the credential is a dSD-JWT+KB then the <code>typ</code> MUST be "kb-sd-jwt+kb", otherwise it MUST be "kb+sd-jwt" or "kb-sd-jwt+kb"<a href="#section-6-2.4.2.2" class="pilcrow">¶</a>
+</li>
+          </ol>
+</li>
+        <li id="section-6-2.5">
+          <p id="section-6-2.5.1">If Key Binding is required<a href="#section-6-2.5.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-6-2.5.2">
+<li id="section-6-2.5.2.1">If the credential is a dSD-JWT (without Key Binding), the Verifier MUST reject the presentation, as per <a href="https://rfc-editor.org/rfc/rfc9901#appendix-Section%207.3" class="relref">Section 7.3</a>.<a href="#section-6-2.5.2.1" class="pilcrow">¶</a>
+</li>
+            <li id="section-6-2.5.2.2">Follow step 5 of <a href="https://rfc-editor.org/rfc/rfc9901#appendix-Section%207.3" class="relref">Section 7.3</a> to verify the KB-JWT, using the final KB-SD-JWT to retrieve the Delegate Holder public key.<a href="#section-6-2.5.2.2" class="pilcrow">¶</a>
+</li>
+            <li id="section-6-2.5.2.3">Calculate the digest over the final KB-SD-JWT+KB and its disclosures as described in <a href="https://rfc-editor.org/rfc/rfc9901#appendix-Section%204.3.1" class="relref">Section 4.3.1</a>, and verify that it matches the value of the <code>sd_hash</code> claim.<a href="#section-6-2.5.2.3" class="pilcrow">¶</a>
+</li>
+          </ol>
+</li>
+      </ol>
+<p id="section-6-3">If any of the steps fail then the presentation is invalid and processing MUST be aborted. Otherwise the list of processed SD-JWT and Delegate Payloads MAY be passed to the application to be used for their intended purpose.<a href="#section-6-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="delegation-using-presentation">
+<section id="section-7">
+      <h2 id="name-delegation-using-presentati">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-delegation-using-presentati" class="section-name selfRef">Delegation using Presentation</a>
+      </h2>
+<p id="section-7-1">Presentation mechanisms that allow specification of additional transaction data within the KB-JWT can be used to perform delegation. Below is a description of how this can be done using the OpenID4VP presentation protocol.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div id="dsd-jwt-delegation-using-openid4vp">
+<section id="section-7.1">
+        <h3 id="name-dsd-jwt-delegation-using-op">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-dsd-jwt-delegation-using-op" class="section-name selfRef">dSD-JWT Delegation using OpenID4VP</a>
+        </h3>
+<p id="section-7.1-1">OpenId4VP <span>[<a href="#OIDF.OID4VP" class="cite xref">OIDF.OID4VP</a>]</span> specifies <code>transaction_data</code> within the request, which is included within the KB-JWT. To delegate an dSD-JWT or dSD-JWT+KB the transaction data <code>type</code> <code>delegate</code> MAY be used. The following additional parameters are included in the <code>transaction_data</code> object:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-7.1-2.1">“format”: REQUIRED string containing either <code>dSD-JWT</code> or <code>dSD-JWT+KB</code><a href="#section-7.1-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-7.1-2.2">“delegate_payload_disclosure”: REQUIRED String containing the Array Disclosure of the delegate payload.<a href="#section-7.1-2.2" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="section-7.1-2.3">“delegate_disclosures”: OPTIONAL Array of Strings containing the Disclosures for the selectively disclosable claims.<a href="#section-7.1-2.3" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-7.1-3">The delegate payload MUST NOT contain any disclosures not provided in <code>delegate_disclosures</code>. The KB-JWT includes the digest of the <code>delegate_payload</code> in the <code>delegate_payload</code> claim of the KB-JWT. <code>_sd_alg</code> may use any hash algorithm specified for hashing the <code>transaction_data</code>. The Wallet MAY include additional decoy digests.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">Multiple <code>delegate</code> <code>transaction_data</code> MAY be included in the same request. In that case, each MUST have their digest included in the <code>delegate_payload</code>.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-8">
+      <h2 id="name-security-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-8-1">Security Considerations as described in <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> also apply to delegate SD-JWTs. When the Holder is performing a delegation, they are acting as an Issuer of an SD-JWT and so all security considerations of an issuer apply to them.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div id="mandatory-verification-of-delegate-sd-jwt-chain">
+<section id="section-8.1">
+        <h3 id="name-mandatory-verification-of-d">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-mandatory-verification-of-d" class="section-name selfRef">Mandatory verification of delegate SD-JWT Chain</a>
+        </h3>
+<p id="section-8.1-1">It is critical that the Verifier verifies each KB-SD-JWT in the chain and ensures that it is bound to the preceding Issuer JWT or KB-SD-JWT with the <code>sd_hash</code> or <code>issuer_jwt_hash</code>. Without verifying the binding in both directions a malicious Delegate Holder may mis-match parts of the chain if the Holder <code>cnf</code> is reused.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="delegation-policy">
+<section id="section-8.2">
+        <h3 id="name-delegation-policy">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-delegation-policy" class="section-name selfRef">Delegation Policy</a>
+        </h3>
+<p id="section-8.2-1">An Issuer or Holder that wishes to limit delegation MAY include such constraints as visible claims in the Issuer signed JWT or KB-SD-JWT+KB.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="delegate-sd-jwt-revocation">
+<section id="section-8.3">
+        <h3 id="name-delegate-sd-jwt-revocation">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-delegate-sd-jwt-revocation" class="section-name selfRef">Delegate SD-JWT Revocation</a>
+        </h3>
+<p id="section-8.3-1">While traditional mechanisms of credential revocation can be used with delegate SD-JWTs, they present a practical challenge as, unlike a traditional Issuer, an individual Holder can not easily distribute revocation information to Verifiers.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<p id="section-8.3-2">Having a short <code>exp</code> and using claims to constrain the usage of the delegated SD-JWT limits this problem, as do cases where the Holder and the Delegate Holder are managed by the same entity.<a href="#section-8.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="privacy-considerations">
+<section id="section-9">
+      <h2 id="name-privacy-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<p id="section-9-1">The privacy considerations in <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span> Section 10 also apply to Delegate SD-JWTs.<a href="#section-9-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-10">
+      <h2 id="name-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-10.1">
+        <h3 id="name-normative-references">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="OIDF.OID4VP">[OIDF.OID4VP]</dt>
+        <dd>
+<span class="refAuthor">Terbu, O.</span>, <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Yasuda, K.</span>, <span class="refAuthor">Fett, D.</span>, and <span class="refAuthor">J. Heenan</span>, <span class="refTitle">"OpenID for Verifiable Presentations 1.0"</span>, <time datetime="2025-07-09" class="refDate">9 July 2025</time>, <span>&lt;<a href="https://openid.net/specs/openid-4-verifiable-presentations-1_0.html">https://openid.net/specs/openid-4-verifiable-presentations-1_0.html</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6838">[RFC6838]</dt>
+        <dd>
+<span class="refAuthor">Freed, N.</span>, <span class="refAuthor">Klensin, J.</span>, and <span class="refAuthor">T. Hansen</span>, <span class="refTitle">"Media Type Specifications and Registration Procedures"</span>, <span class="seriesInfo">BCP 13</span>, <span class="seriesInfo">RFC 6838</span>, <span class="seriesInfo">DOI 10.17487/RFC6838</span>, <time datetime="2013-01" class="refDate">January 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6838">https://www.rfc-editor.org/info/rfc6838</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7519">[RFC7519]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7519">https://www.rfc-editor.org/info/rfc7519</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9901">[RFC9901]</dt>
+      <dd>
+<span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Yasuda, K.</span>, and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"Selective Disclosure for JSON Web Tokens"</span>, <span class="seriesInfo">RFC 9901</span>, <span class="seriesInfo">DOI 10.17487/RFC9901</span>, <time datetime="2025-11" class="refDate">November 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9901">https://www.rfc-editor.org/info/rfc9901</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-10.2">
+        <h3 id="name-informative-references">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="IANA.JWT">[IANA.JWT]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"JSON Web Token Claims"</span>, <span>&lt;<a href="https://www.iana.org/assignments/jwt">https://www.iana.org/assignments/jwt</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA.MediaTypes">[IANA.MediaTypes]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"Media Types"</span>, <span>&lt;<a href="https://www.iana.org/assignments/media-types/media-types.xhtml">https://www.iana.org/assignments/media-types/media-types.xhtml</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2046">[RFC2046]</dt>
+      <dd>
+<span class="refAuthor">Freed, N.</span> and <span class="refAuthor">N. Borenstein</span>, <span class="refTitle">"Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types"</span>, <span class="seriesInfo">RFC 2046</span>, <span class="seriesInfo">DOI 10.17487/RFC2046</span>, <time datetime="1996-11" class="refDate">November 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2046">https://www.rfc-editor.org/info/rfc2046</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="iana-considerations">
+<section id="appendix-A">
+      <h2 id="name-iana-considerations">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="json-web-token-claims-registration">
+<section id="appendix-A.1">
+        <h3 id="name-json-web-token-claims-regis">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-json-web-token-claims-regis" class="section-name selfRef">JSON Web Token Claims Registration</a>
+        </h3>
+<p id="appendix-A.1-1">This specification requests registration of the following Claims in the
+IANA "JSON Web Token Claims" registry <span>[<a href="#IANA.JWT" class="cite xref">IANA.JWT</a>]</span> established by <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-A.1-2.1">Claim Name: <code>issuer_jwt_hash</code><a href="#appendix-A.1-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.1-2.2">Claim Description: Digest of the Issuer-JWT to which the KB-SD-JWT is tied<a href="#appendix-A.1-2.2" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.1-2.3">Change Controller: IETF<a href="#appendix-A.1-2.3" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.1-2.4">Specification Document(s):  [[ <a href="#kb-sd-jwt" class="auto internal xref">Section 5.1.4</a> of this specification ]]<a href="#appendix-A.1-2.4" class="pilcrow">¶</a>
+</li>
+        </ul>
+</section>
+</div>
+<div id="media-type-registration">
+<section id="appendix-A.2">
+        <h3 id="name-media-type-registration">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-media-type-registration" class="section-name selfRef">Media Type Registration</a>
+        </h3>
+<p id="appendix-A.2-1">This section requests registration of the following media types <span>[<a href="#RFC2046" class="cite xref">RFC2046</a>]</span> in
+the "Media Types" registry <span>[<a href="#IANA.MediaTypes" class="cite xref">IANA.MediaTypes</a>]</span> in the manner described
+in <span>[<a href="#RFC6838" class="cite xref">RFC6838</a>]</span>.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">To indicate that the content is a Key Binding SD-JWT:<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-A.2-3.1">Type name: application<a href="#appendix-A.2-3.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.2">Subtype name: kb+sd-jwt<a href="#appendix-A.2-3.2" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.3">Required parameters: n/a<a href="#appendix-A.2-3.3" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.4">Optional parameters: n/a<a href="#appendix-A.2-3.4" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.5">Encoding considerations: binary; A Key Binding SD-JWT is a SD-JWT; SD-JWT values are a series of base64url-encoded values (some of which may be the empty string) separated by period ('.') and tilde ('~') characters.<a href="#appendix-A.2-3.5" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.6">Security considerations: See the Security Considerations section of [[ this specification ]] and <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span>.<a href="#appendix-A.2-3.6" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.7">Interoperability considerations: n/a<a href="#appendix-A.2-3.7" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.8">Published specification: [[ this specification ]]<a href="#appendix-A.2-3.8" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.9">Applications that use this media type: Applications utilizing a JWT based proof of possession mechanism with further selective disclosure.<a href="#appendix-A.2-3.9" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.10">Fragment identifier considerations: n/a<a href="#appendix-A.2-3.10" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.11">
+            <p id="appendix-A.2-3.11.1">Additional information:<a href="#appendix-A.2-3.11.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-A.2-3.11.2.1">Magic number(s): n/a<a href="#appendix-A.2-3.11.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="appendix-A.2-3.11.2.2">File extension(s): n/a<a href="#appendix-A.2-3.11.2.2" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="appendix-A.2-3.11.2.3">Macintosh file type code(s): n/a<a href="#appendix-A.2-3.11.2.3" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+          <li class="compact" id="appendix-A.2-3.12">Person &amp; email address to contact for further information: Gareth Oliver, gco@google.com<a href="#appendix-A.2-3.12" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.13">Intended usage: COMMON<a href="#appendix-A.2-3.13" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.14">Restrictions on usage: none<a href="#appendix-A.2-3.14" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.15">Author: Gareth Oliver, gco@google.com<a href="#appendix-A.2-3.15" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.16">Change Controller: IETF<a href="#appendix-A.2-3.16" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-3.17">Provisional registration?  No<a href="#appendix-A.2-3.17" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="appendix-A.2-4">To indicate that the content is a Key Binding SD-JWT+KB:<a href="#appendix-A.2-4" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-A.2-5.1">Type name: application<a href="#appendix-A.2-5.1" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.2">Subtype name: kb-sd-jwt+kb<a href="#appendix-A.2-5.2" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.3">Required parameters: n/a<a href="#appendix-A.2-5.3" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.4">Optional parameters: n/a<a href="#appendix-A.2-5.4" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.5">Encoding considerations: binary; A Key Binding SD-JWT+KB is a SD-JWT+KB; SD-JWT values are a series of base64url-encoded values (some of which may be the empty string) separated by period ('.') and tilde ('~') characters.<a href="#appendix-A.2-5.5" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.6">Security considerations: See the Security Considerations section of [[ this specification ]] and <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span>.<a href="#appendix-A.2-5.6" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.7">Interoperability considerations: n/a<a href="#appendix-A.2-5.7" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.8">Published specification: [[ this specification ]]<a href="#appendix-A.2-5.8" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.9">Applications that use this media type: Applications utilizing a JWT based proof of possession mechanism with further selective disclosure.<a href="#appendix-A.2-5.9" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.10">Fragment identifier considerations: n/a<a href="#appendix-A.2-5.10" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.11">
+            <p id="appendix-A.2-5.11.1">Additional information:<a href="#appendix-A.2-5.11.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-A.2-5.11.2.1">Magic number(s): n/a<a href="#appendix-A.2-5.11.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="appendix-A.2-5.11.2.2">File extension(s): n/a<a href="#appendix-A.2-5.11.2.2" class="pilcrow">¶</a>
+</li>
+              <li class="compact" id="appendix-A.2-5.11.2.3">Macintosh file type code(s): n/a<a href="#appendix-A.2-5.11.2.3" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+          <li class="compact" id="appendix-A.2-5.12">Person &amp; email address to contact for further information: Gareth Oliver, gco@google.com<a href="#appendix-A.2-5.12" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.13">Intended usage: COMMON<a href="#appendix-A.2-5.13" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.14">Restrictions on usage: none<a href="#appendix-A.2-5.14" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.15">Author: Gareth Oliver, gco@google.com<a href="#appendix-A.2-5.15" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.16">Change Controller: IETF<a href="#appendix-A.2-5.16" class="pilcrow">¶</a>
+</li>
+          <li class="compact" id="appendix-A.2-5.17">Provisional registration?  No<a href="#appendix-A.2-5.17" class="pilcrow">¶</a>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
+      <h2 id="name-acknowledgments">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-B-1">TODO<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="document-history">
+<section id="appendix-C">
+      <h2 id="name-document-history">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-document-history" class="section-name selfRef">Document History</a>
+      </h2>
+<p id="appendix-C-1">-00<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-C-2.1">Initial Working Group Draft (adopted from draft-gco-oauth-delegate-sd-jwt)<a href="#appendix-C-2.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="appendix-C-3">[[ pre Working Group Adoption: ]]<a href="#appendix-C-3" class="pilcrow">¶</a></p>
+<p id="appendix-C-4">-01<a href="#appendix-C-4" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-C-5.1">editorial fixes<a href="#appendix-C-5.1" class="pilcrow">¶</a>
+</li>
+        <li class="compact" id="appendix-C-5.2">change kb+sd-jwt+kb to kb-sd-jwt+kb<a href="#appendix-C-5.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="appendix-C-6">-00<a href="#appendix-C-6" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-C-7.1">Initial Version<a href="#appendix-C-7.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-D">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Gareth Oliver</span></div>
+<div dir="auto" class="left"><span class="org">Google</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:gco@google.com" class="email">gco@google.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Christian Bormann</span></div>
+<div dir="auto" class="left"><span class="org">SPRIND</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:chris.bormann@gmx.de" class="email">chris.bormann@gmx.de</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
