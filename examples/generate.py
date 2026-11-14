@@ -69,21 +69,21 @@ l1_payload={'iss':'https://issuer.example.test','sub':'user-42','iat':NOW,'exp':
 l1=sign({'alg':'ES256','typ':'sd+jwt','kid':'issuer-key-1'},l1_payload,ISSUER)
 l1_present=l1+'~'+email_d+'~'
 
-# L2: Holder delegates to the Delegate Holder. KB-SD-JWT+KB, so typ is "kb-sd-jwt+kb"
-# and the Delegate Payload carries cnf. Two authorizations are separately disclosable.
+# L2: Holder delegates to the Delegate Holder. KB-SD-JWT+KB, so typ is "kb-sd-jwt+kb".
+# The security claims, including cnf naming the Delegate Holder key, live in the base
+# KB-SD-JWT payload; the Delegate Payload carries application content only.
 # The vct values are illustrative only; they are not canonical structures of any
 # payment protocol and are not intended to track one.
 payment={'vct':'example.payment.mandate','payment_amount':{'currency':'JPY','max_amount':15000},
-         'allowed_payees':['merchant.example.test'],'cnf':{'jwk':jwk(AGENT)}}
+         'allowed_payees':['merchant.example.test']}
 checkout={'vct':'example.checkout.mandate','allowed_merchants':['merchant.example.test'],
-          'allowed_items':[{'sku':'SKU-BOOK-001','max_quantity':2}], 'cnf':{'jwk':jwk(AGENT)}}
+          'allowed_items':[{'sku':'SKU-BOOK-001','max_quantity':2}]}
 pay_d,pay_hash=disclosure('demo-payment-salt','payment_mandate',payment)
 checkout_d,checkout_hash=disclosure('demo-checkout-salt','checkout_mandate',checkout)
-l2_delegate={'vct':'https://example.test/delegation','cnf':{'jwk':jwk(AGENT)},
-             '_sd':[pay_hash,checkout_hash]}
+l2_delegate={'vct':'https://example.test/delegation','_sd':[pay_hash,checkout_hash]}
 l2_dp,l2_dp_hash=array_disclosure('demo-l2-payload',l2_delegate)
 l2_payload={'iat':NOW,'exp':NOW+86400,'nonce':'holder-nonce-demo','aud':'https://agent.example.test',
-            'sd_hash':sd_hash(l1_present),'_sd_alg':'sha-256',
+            'cnf':{'jwk':jwk(AGENT)},'sd_hash':sd_hash(l1_present),'_sd_alg':'sha-256',
             'delegate_payload':[array_digest(l2_dp_hash)]}
 l2=sign({'alg':'ES256','typ':'kb-sd-jwt+kb','kid':'holder-key-1'},l2_payload,HOLDER)
 
@@ -132,10 +132,12 @@ def verify_all():
     assert email_hash in p1['_sd'];verify_disclosure(email_d,email_hash)
     p2=check(l2,verify_key(HOLDER),'kb-sd-jwt+kb')
     assert p1['cnf']['jwk']==jwk(HOLDER)
+    # Per PR #15 cnf for a KB-SD-JWT+KB lives in the base payload, not the Delegate Payload.
+    assert p2['cnf']['jwk']==jwk(AGENT)
     assert p2['sd_hash']==sd_hash(l1_present)
     assert array_element_digest(p2['delegate_payload'][0])==l2_dp_hash
     dp=verify_disclosure(l2_dp,l2_dp_hash)[1]
-    assert dp['cnf']['jwk']==jwk(AGENT)
+    assert 'cnf' not in dp
     assert pay_hash in dp['_sd'] and checkout_hash in dp['_sd']
     assert verify_disclosure(pay_d,pay_hash)[1]=='payment_mandate'
     assert verify_disclosure(checkout_d,checkout_hash)[1]=='checkout_mandate'
@@ -175,6 +177,13 @@ def disclosures_md(items):
                    f'Disclosure:\n{wrap(enc)}\nContents:\n'
                    f'{json.dumps(contents, indent=2, ensure_ascii=False)}\n```\n')
     return '\n'.join(out)
+
+# Trust anchors for the independent verifier: only the keys a Verifier must know out
+# of band. Every other key in the chain is reached through a cnf claim.
+write_json('trust_anchors.json', {
+    'issuer-key-1': jwk(ISSUER),
+    'merchant-key-1': jwk(MERCHANT),
+})
 
 write_json('sd_jwt_header.json', decode(l1)[0])
 write_json('sd_jwt_payload.json', l1_payload)

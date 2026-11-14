@@ -1,15 +1,7 @@
 {
   "vct": "https://example.test/delegation",
-  "cnf": {
-    "jwk": {
-      "kty": "EC",
-      "crv": "P-256",
-      "x": "BJS-pgDQ9kzyY1pJus2_eIFy2OtyCHgk8I6FTXOOXLk",
-      "y": "yDzeKYFFhVFXeDnf2JItju2e0UyU_2iOqXkLu-XnJFM"
-    }
-  },
   "_sd": [
-    "HclQYFfRTk5gC6BfXeVoBTu-0zxX8dsa4MskS2Mki7A",
-    "-4w_rNAW4hfK6gFgGfQAiSjQfHqS7rEvU38wg-F2nl4"
+    "mBrNUVVLfNss7ElcPTrlY6p6NI35WLC96hFSpJUMjdc",
+    "4wS7iL0voneDcYTrHTFJ-54nX6x92YrxxsXpg1JNFEI"
   ]
 }

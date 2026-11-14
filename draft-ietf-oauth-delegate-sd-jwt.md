@@ -271,6 +271,8 @@ This section works one chain through issuance, delegation and presentation. It u
 
 The whole example is non-normative. Its keys and timestamps are fixed demonstration values, and the claim names and `vct` values below the Delegate Payload level are illustrative rather than defined by this specification. The example is shaped like a payment delegation because that is the use case introduced in (#introduction), but the structures are not canonical to any payment protocol and are not intended to track one.
 
+The example is verified by a separate program that reads the serialized tokens back from disk and recomputes every digest itself, so a Verifier implementation can be checked against the same bytes.
+
 ### Issuance
 
 The Issuer signs an SD-JWT for the Holder. The protected header in (#ex-sd-jwt-header) carries the `typ` of "sd+jwt", and the `cnf` claim in (#ex-sd-jwt-payload) carries the Holder key that will sign the first KB-SD-JWT.
@@ -290,17 +292,17 @@ Figure: SD-JWT as Issued to the Holder {#ex-sd-jwt-issuance}
 
 ### Delegation
 
-To delegate, the Holder signs a KB-SD-JWT over the SD-JWT it received. Because a further delegation or presentation will follow, this is a KB-SD-JWT+KB, so the protected header in (#ex-kb-sd-jwt-header) carries a `typ` of "kb-sd-jwt+kb" and the Delegate Payload includes a `cnf` claim naming the Delegate Holder key.
+To delegate, the Holder signs a KB-SD-JWT over the SD-JWT it received. Because a further delegation or presentation will follow, this is a KB-SD-JWT+KB, so the protected header in (#ex-kb-sd-jwt-header) carries a `typ` of "kb-sd-jwt+kb".
 
 <{{examples/01/kb_sd_jwt_header.json}}
 Figure: KB-SD-JWT+KB Protected Header {#ex-kb-sd-jwt-header}
 
-(#ex-kb-sd-jwt-payload) is the KB-SD-JWT+KB payload. `sd_hash` is computed over (#ex-sd-jwt-issuance) including its disclosure, binding this layer to what the Holder actually received. `_sd_alg` stays in this payload.
+(#ex-kb-sd-jwt-payload) is the KB-SD-JWT+KB payload. The security claims sit here rather than in the Delegate Payload: `cnf` names the Delegate Holder key that signs the next component, `aud` and `nonce` identify this delegation step, and `sd_hash` is computed over (#ex-sd-jwt-issuance) including its disclosure, binding this layer to what the Holder actually received. `exp` is earlier than the Issuer-signed JWT's, so the validity window narrows across the chain.
 
 <{{examples/01/kb_sd_jwt_payload.json}}
 Figure: KB-SD-JWT+KB Payload {#ex-kb-sd-jwt-payload}
 
-The single entry in `delegate_payload` is the Array Disclosure digest of (#ex-delegate-payload), carried in the `{"...": digest}` form [@!RFC9901] uses for a selectively disclosable array element. That payload carries the Delegate Holder key and two selectively disclosable claims, which lets the Delegate Holder reveal a different one to each Verifier.
+The single entry in `delegate_payload` is the Array Disclosure digest of (#ex-delegate-payload), carried in the `{"...": digest}` form [@!RFC9901] uses for a selectively disclosable array element. With the security claims in the base payload, the Delegate Payload carries only application content: here two selectively disclosable claims, which lets the Delegate Holder reveal a different one to each Verifier.
 
 <{{examples/01/delegate_payload.json}}
 Figure: Delegate Payload {#ex-delegate-payload}

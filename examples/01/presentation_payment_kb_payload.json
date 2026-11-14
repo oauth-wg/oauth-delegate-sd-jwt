@@ -3,7 +3,7 @@
   "exp": 1793603100,
   "nonce": "agent-network",
   "aud": "https://network.example.test",
-  "sd_hash": "Xlkh-597gS5sGrKaoDJnXD3M2NowTBtxLfN1DERLRJY",
+  "sd_hash": "b-VeX63z-4_8LEJuqAL5E4gQ8WlA6mn_s50qLstvyus",
   "_sd_alg": "sha-256",
   "delegate_payload": [
     {

@@ -1,0 +1,14 @@
+{
+  "issuer-key-1": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "zPeoe-XKFurACJI9qx4ouBIxBao8zZkYcFIiyl06fMY",
+    "y": "uycuqOVTCPkCUslqLpVr6LY25XjjLTZj_1tv_l6dbLI"
+  },
+  "merchant-key-1": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "1y-KFtv2_DMC3mmtXKqGL82AWvL4pEE-wX1OukrkpAk",
+    "y": "rrJZLseZtu5SC9kzLvt5OdShV-yAkfRfwzmhuXrhRdI"
+  }
+}
