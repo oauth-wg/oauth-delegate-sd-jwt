@@ -1,0 +1,5 @@
+{
+  "alg": "ES256",
+  "kid": "holder-key-1",
+  "typ": "kb-sd-jwt+kb"
+}

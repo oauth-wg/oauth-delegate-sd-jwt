@@ -1,0 +1,14 @@
+{
+  "vct": "example.payment.mandate",
+  "payment_instrument": {
+    "last_four": "4242"
+  },
+  "payment_amount": {
+    "currency": "JPY",
+    "amount": 12000
+  },
+  "payee": {
+    "id": "merchant.example.test"
+  },
+  "transaction_id": "Mg9H0ktb9prnkqfn5zA7dYB07qB3f5SCplf2OJkDujQ"
+}

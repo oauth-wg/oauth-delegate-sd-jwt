@@ -22,3 +22,5 @@ draft-ietf-oauth-delegate-sd-jwt.xml
 package-lock.json
 report.xml
 !requirements.txt
+!examples/**/*.txt
+__pycache__/

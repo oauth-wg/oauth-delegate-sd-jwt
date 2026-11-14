@@ -1,0 +1,21 @@
+{
+  "iss": "https://issuer.example.test",
+  "sub": "user-42",
+  "iat": 1793602800,
+  "exp": 1825138800,
+  "vct": "https://example.test/credentials/card",
+  "cnf": {
+    "jwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "9yjFfkcRXy4gzA3L-WgKGprCkwn8KJKK9-oBzTa0t7k",
+      "y": "FON4SMOmrrqQheMUJiBnHamiRuQb9u89pqTGEub0nCk"
+    }
+  },
+  "pan_last_four": "4242",
+  "scheme": "example",
+  "_sd_alg": "sha-256",
+  "_sd": [
+    "v-2uGQ24J9USjGJfXvX4uhSSHuzMyTYY0BDjEbz6o78"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "vct": "example.checkout.mandate",
+  "checkout_jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6Im1lcmNoYW50LWtleS0xIiwidHlwIjoiSldUIn0.eyJjdXJyZW5jeSI6IkpQWSIsImV4cCI6MTc5MzYwMzEwMCwiaWF0IjoxNzkzNjAyODAwLCJpc3MiOiJodHRwczovL21lcmNoYW50LmV4YW1wbGUudGVzdCIsIml0ZW1zIjpbeyJxdWFudGl0eSI6MSwic2t1IjoiU0tVLUJPT0stMDAxIiwidW5pdF9wcmljZSI6MTIwMDB9XX0.LSaN6TX2HjWFhqe7k7Fybl_VJ05Ub7Pb7UPMSd_DTJbG1i899BC6p52EFobqmermKRe-MR_kPxuhZvuOd-a7KA",
+  "checkout_hash": "Mg9H0ktb9prnkqfn5zA7dYB07qB3f5SCplf2OJkDujQ",
+  "line_items": [
+    {
+      "sku": "SKU-BOOK-001",
+      "quantity": 1
+    }
+  ]
+}
