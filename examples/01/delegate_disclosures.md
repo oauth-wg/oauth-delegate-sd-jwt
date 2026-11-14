@@ -1,21 +1,21 @@
 __Disclosure for `Delegate Payload (array element)`:__
 
 ```
-SHA-256 Hash: wSDiixEiiUJftWeBNAwo3nDjfHBss_qUTsFpD--O-0Y
+SHA-256 Hash: RgUgNYLKYnEY4jNXn29W0cxxc3TVTXaqNj-iToQLQIg
 Disclosure:
-WyJkZW1vLWwyLXBheWxvYWQiLHsiX3NkIjpbIjU3OU5NV0FmN0VXMUhqUEY3UXduWVRa
-b3I3VXpLVlhia3hqV1cxVTNxeEEiLCIzSElYM09CZExCbloxTEhuaU9WWHU5MVZQcWFi
-dTZYM1o5Q21DaXAzVWlBIl0sImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJrdHki
+WyJkZW1vLWwyLXBheWxvYWQiLHsiX3NkIjpbIkhjbFFZRmZSVGs1Z0M2QmZYZVZvQlR1
+LTB6eFg4ZHNhNE1za1MyTWtpN0EiLCItNHdfck5BVzRoZks2Z0ZnR2ZRQWlTalFmSHFT
+N3JFdlUzOHdnLUYybmw0Il0sImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJrdHki
 OiJFQyIsIngiOiJCSlMtcGdEUTlrenlZMXBKdXMyX2VJRnkyT3R5Q0hnazhJNkZUWE9P
 WExrIiwieSI6InlEemVLWUZGaFZGWGVEbmYySkl0anUyZTBVeVVfMmlPcVhrTHUtWG5K
-Rk0ifX0sInZjdCI6Imh0dHBzOi8vZXhhbXBsZS50ZXN0L3ZpL2F1dG9ub21vdXMifV0
+Rk0ifX0sInZjdCI6Imh0dHBzOi8vZXhhbXBsZS50ZXN0L2RlbGVnYXRpb24ifV0
 Contents:
 [
   "demo-l2-payload",
   {
     "_sd": [
-      "579NMWAf7EW1HjPF7QwnYTZor7UzKVXbkxjWW1U3qxA",
-      "3HIX3OBdLBnZ1LHniOVXu91VPqabu6X3Z9CmCip3UiA"
+      "HclQYFfRTk5gC6BfXeVoBTu-0zxX8dsa4MskS2Mki7A",
+      "-4w_rNAW4hfK6gFgGfQAiSjQfHqS7rEvU38wg-F2nl4"
     ],
     "cnf": {
       "jwk": {
@@ -25,7 +25,7 @@ Contents:
         "y": "yDzeKYFFhVFXeDnf2JItju2e0UyU_2iOqXkLu-XnJFM"
       }
     },
-    "vct": "https://example.test/vi/autonomous"
+    "vct": "https://example.test/delegation"
   }
 ]
 ```
@@ -33,14 +33,15 @@ Contents:
 __Disclosure for `payment_mandate`:__
 
 ```
-SHA-256 Hash: 579NMWAf7EW1HjPF7QwnYTZor7UzKVXbkxjWW1U3qxA
+SHA-256 Hash: HclQYFfRTk5gC6BfXeVoBTu-0zxX8dsa4MskS2Mki7A
 Disclosure:
 WyJkZW1vLXBheW1lbnQtc2FsdCIsInBheW1lbnRfbWFuZGF0ZSIseyJhbGxvd2VkX3Bh
 eWVlcyI6WyJtZXJjaGFudC5leGFtcGxlLnRlc3QiXSwiY25mIjp7Imp3ayI6eyJjcnYi
 OiJQLTI1NiIsImt0eSI6IkVDIiwieCI6IkJKUy1wZ0RROWt6eVkxcEp1czJfZUlGeTJP
 dHlDSGdrOEk2RlRYT09YTGsiLCJ5IjoieUR6ZUtZRkZoVkZYZURuZjJKSXRqdTJlMFV5
 VV8yaU9xWGtMdS1YbkpGTSJ9fSwicGF5bWVudF9hbW91bnQiOnsiY3VycmVuY3kiOiJK
-UFkiLCJtYXhfYW1vdW50IjoxNTAwMH0sInZjdCI6Im1hbmRhdGUucGF5bWVudC4xIn1d
+UFkiLCJtYXhfYW1vdW50IjoxNTAwMH0sInZjdCI6ImV4YW1wbGUucGF5bWVudC5tYW5k
+YXRlIn1d
 Contents:
 [
   "demo-payment-salt",
@@ -61,7 +62,7 @@ Contents:
       "currency": "JPY",
       "max_amount": 15000
     },
-    "vct": "mandate.payment.1"
+    "vct": "example.payment.mandate"
   }
 ]
 ```
@@ -69,15 +70,15 @@ Contents:
 __Disclosure for `checkout_mandate`:__
 
 ```
-SHA-256 Hash: 3HIX3OBdLBnZ1LHniOVXu91VPqabu6X3Z9CmCip3UiA
+SHA-256 Hash: -4w_rNAW4hfK6gFgGfQAiSjQfHqS7rEvU38wg-F2nl4
 Disclosure:
 WyJkZW1vLWNoZWNrb3V0LXNhbHQiLCJjaGVja291dF9tYW5kYXRlIix7ImFsbG93ZWRf
 aXRlbXMiOlt7Im1heF9xdWFudGl0eSI6Miwic2t1IjoiU0tVLUJPT0stMDAxIn1dLCJh
 bGxvd2VkX21lcmNoYW50cyI6WyJtZXJjaGFudC5leGFtcGxlLnRlc3QiXSwiY25mIjp7
 Imp3ayI6eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIiwieCI6IkJKUy1wZ0RROWt6eVkx
 cEp1czJfZUlGeTJPdHlDSGdrOEk2RlRYT09YTGsiLCJ5IjoieUR6ZUtZRkZoVkZYZURu
-ZjJKSXRqdTJlMFV5VV8yaU9xWGtMdS1YbkpGTSJ9fSwidmN0IjoibWFuZGF0ZS5jaGVj
-a291dC4xIn1d
+ZjJKSXRqdTJlMFV5VV8yaU9xWGtMdS1YbkpGTSJ9fSwidmN0IjoiZXhhbXBsZS5jaGVj
+a291dC5tYW5kYXRlIn1d
 Contents:
 [
   "demo-checkout-salt",
@@ -100,7 +101,7 @@ Contents:
         "y": "yDzeKYFFhVFXeDnf2JItju2e0UyU_2iOqXkLu-XnJFM"
       }
     },
-    "vct": "mandate.checkout.1"
+    "vct": "example.checkout.mandate"
   }
 ]
 ```

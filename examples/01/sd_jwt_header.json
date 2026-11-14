@@ -1,0 +1,5 @@
+{
+  "alg": "ES256",
+  "kid": "issuer-key-1",
+  "typ": "sd+jwt"
+}

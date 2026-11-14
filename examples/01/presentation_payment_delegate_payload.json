@@ -1,5 +1,5 @@
 {
-  "vct": "mandate.payment.1",
+  "vct": "example.payment.mandate",
   "payment_instrument": {
     "last_four": "4242"
   },

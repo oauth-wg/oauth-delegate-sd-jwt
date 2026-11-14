@@ -269,11 +269,14 @@ SD-JWT changes:
 
 This section works one chain through issuance, delegation and presentation. It uses a single delegation, so the chain is `SD-JWT ~~ KB-SD-JWT+KB ~~ KB-SD-JWT`, and both presentations are dSD-JWTs: the Delegate Holder is the final party, so no delegate KB-JWT is appended.
 
-The example is generated and self-verified by `examples/generate.py`. Its keys are demonstration keys and MUST NOT be reused. Claims below the Delegate Payload level are illustrative of one application and are not defined by this specification.
+The whole example is non-normative. Its keys and timestamps are fixed demonstration values, and the claim names and `vct` values below the Delegate Payload level are illustrative rather than defined by this specification. The example is shaped like a payment delegation because that is the use case introduced in (#introduction), but the structures are not canonical to any payment protocol and are not intended to track one.
 
 ### Issuance
 
-The Issuer signs an SD-JWT for the Holder. The `cnf` claim in (#ex-sd-jwt-payload) carries the Holder key that will sign the first KB-SD-JWT.
+The Issuer signs an SD-JWT for the Holder. The protected header in (#ex-sd-jwt-header) carries the `typ` of "sd+jwt", and the `cnf` claim in (#ex-sd-jwt-payload) carries the Holder key that will sign the first KB-SD-JWT.
+
+<{{examples/01/sd_jwt_header.json}}
+Figure: Issuer-signed JWT Protected Header {#ex-sd-jwt-header}
 
 <{{examples/01/sd_jwt_payload.json}}
 Figure: Issuer-signed JWT Payload {#ex-sd-jwt-payload}
@@ -287,14 +290,17 @@ Figure: SD-JWT as Issued to the Holder {#ex-sd-jwt-issuance}
 
 ### Delegation
 
-To delegate, the Holder signs a KB-SD-JWT over the SD-JWT it received. Because a further delegation or presentation will follow, this is a KB-SD-JWT+KB: the `typ` is "kb-sd-jwt+kb" and the Delegate Payload includes a `cnf` claim naming the Delegate Holder key.
+To delegate, the Holder signs a KB-SD-JWT over the SD-JWT it received. Because a further delegation or presentation will follow, this is a KB-SD-JWT+KB, so the protected header in (#ex-kb-sd-jwt-header) carries a `typ` of "kb-sd-jwt+kb" and the Delegate Payload includes a `cnf` claim naming the Delegate Holder key.
 
-(#ex-kb-sd-jwt-payload) is the KB-SD-JWT+KB payload. `sd_hash` is computed over (#ex-sd-jwt-issuance) including its disclosure, binding this layer to what the Holder actually received. `_sd_alg` stays in this payload; every other claim moves into the Delegate Payload.
+<{{examples/01/kb_sd_jwt_header.json}}
+Figure: KB-SD-JWT+KB Protected Header {#ex-kb-sd-jwt-header}
+
+(#ex-kb-sd-jwt-payload) is the KB-SD-JWT+KB payload. `sd_hash` is computed over (#ex-sd-jwt-issuance) including its disclosure, binding this layer to what the Holder actually received. `_sd_alg` stays in this payload.
 
 <{{examples/01/kb_sd_jwt_payload.json}}
 Figure: KB-SD-JWT+KB Payload {#ex-kb-sd-jwt-payload}
 
-The single digest in `delegate_payload` is the Array Disclosure of (#ex-delegate-payload). That payload carries the Delegate Holder key and two selectively disclosable claims, which lets the Delegate Holder reveal a different one to each Verifier.
+The single entry in `delegate_payload` is the Array Disclosure digest of (#ex-delegate-payload), carried in the `{"...": digest}` form [@!RFC9901] uses for a selectively disclosable array element. That payload carries the Delegate Holder key and two selectively disclosable claims, which lets the Delegate Holder reveal a different one to each Verifier.
 
 <{{examples/01/delegate_payload.json}}
 Figure: Delegate Payload {#ex-delegate-payload}
@@ -310,7 +316,12 @@ Figure: dSD-JWT Delegated to the Delegate Holder {#ex-dsd-jwt-delegation}
 
 The Delegate Holder presents to two Verifiers. Each presentation reuses the same Issuer-signed JWT and the same KB-SD-JWT+KB, and differs only in which Delegate Payload disclosure is included and in the terminal KB-SD-JWT the Delegate Holder signs.
 
-(#ex-presentation-payment-kb) is the terminal KB-SD-JWT payload for the first Verifier. Its `typ` is "kb+sd-jwt" and its `sd_hash` covers the preceding KB-SD-JWT+KB *as presented to this Verifier* — that is, with only that Verifier's disclosure attached. A chain assembled for one Verifier therefore does not verify at another.
+The terminal KB-SD-JWT is the last component of the chain, so its protected header in (#ex-presentation-kb-header) carries a `typ` of "kb+sd-jwt". Both presentations use this same header.
+
+<{{examples/01/presentation_kb_header.json}}
+Figure: Terminal KB-SD-JWT Protected Header {#ex-presentation-kb-header}
+
+(#ex-presentation-payment-kb) is the terminal KB-SD-JWT payload for the first Verifier. Its `sd_hash` covers the preceding KB-SD-JWT+KB *as presented to this Verifier* — that is, with only that Verifier's disclosure attached. A chain assembled for one Verifier therefore does not verify at another.
 
 <{{examples/01/presentation_payment_kb_payload.json}}
 Figure: Terminal KB-SD-JWT Payload {#ex-presentation-payment-kb}

@@ -57,6 +57,10 @@ def array_disclosure(salt, value):
     enc=b64(js([salt,value]))
     return enc, digest(enc.encode('ascii'))
 
+def array_digest(dig):
+    # RFC 9901 represents a selectively disclosable array element as {"...": digest}.
+    return {'...': dig}
+
 # L1: Issuer-signed SD-JWT, cnf identifies the Holder, email selectively disclosable.
 email_d,email_hash=disclosure('demo-email-salt','email','alice@example.test')
 l1_payload={'iss':'https://issuer.example.test','sub':'user-42','iat':NOW,'exp':NOW+31536000,
@@ -66,18 +70,21 @@ l1=sign({'alg':'ES256','typ':'sd+jwt','kid':'issuer-key-1'},l1_payload,ISSUER)
 l1_present=l1+'~'+email_d+'~'
 
 # L2: Holder delegates to the Delegate Holder. KB-SD-JWT+KB, so typ is "kb-sd-jwt+kb"
-# and the Delegate Payload carries cnf. Two mandates are separately disclosable.
-payment={'vct':'mandate.payment.1','payment_amount':{'currency':'JPY','max_amount':15000},
+# and the Delegate Payload carries cnf. Two authorizations are separately disclosable.
+# The vct values are illustrative only; they are not canonical structures of any
+# payment protocol and are not intended to track one.
+payment={'vct':'example.payment.mandate','payment_amount':{'currency':'JPY','max_amount':15000},
          'allowed_payees':['merchant.example.test'],'cnf':{'jwk':jwk(AGENT)}}
-checkout={'vct':'mandate.checkout.1','allowed_merchants':['merchant.example.test'],
+checkout={'vct':'example.checkout.mandate','allowed_merchants':['merchant.example.test'],
           'allowed_items':[{'sku':'SKU-BOOK-001','max_quantity':2}], 'cnf':{'jwk':jwk(AGENT)}}
 pay_d,pay_hash=disclosure('demo-payment-salt','payment_mandate',payment)
 checkout_d,checkout_hash=disclosure('demo-checkout-salt','checkout_mandate',checkout)
-l2_delegate={'vct':'https://example.test/vi/autonomous','cnf':{'jwk':jwk(AGENT)},
+l2_delegate={'vct':'https://example.test/delegation','cnf':{'jwk':jwk(AGENT)},
              '_sd':[pay_hash,checkout_hash]}
 l2_dp,l2_dp_hash=array_disclosure('demo-l2-payload',l2_delegate)
 l2_payload={'iat':NOW,'exp':NOW+86400,'nonce':'holder-nonce-demo','aud':'https://agent.example.test',
-            'sd_hash':sd_hash(l1_present),'_sd_alg':'sha-256','delegate_payload':[l2_dp_hash]}
+            'sd_hash':sd_hash(l1_present),'_sd_alg':'sha-256',
+            'delegate_payload':[array_digest(l2_dp_hash)]}
 l2=sign({'alg':'ES256','typ':'kb-sd-jwt+kb','kid':'holder-key-1'},l2_payload,HOLDER)
 
 # The Delegate Holder re-serializes L2 per Verifier, revealing only the relevant mandate.
@@ -88,17 +95,17 @@ checkout_jwt=sign({'alg':'ES256','typ':'JWT','kid':'merchant-key-1'},
      'items':[{'sku':'SKU-BOOK-001','quantity':1,'unit_price':12000}], 'currency':'JPY'},MERCHANT)
 transaction_hash=digest(checkout_jwt.encode('ascii'))
 
-l3_payment={'vct':'mandate.payment.1','payment_instrument':{'last_four':'4242'},
+l3_payment={'vct':'example.payment.mandate','payment_instrument':{'last_four':'4242'},
     'payment_amount':{'currency':'JPY','amount':12000},'payee':{'id':'merchant.example.test'},
     'transaction_id':transaction_hash}
-l3_checkout={'vct':'mandate.checkout.1','checkout_jwt':checkout_jwt,'checkout_hash':transaction_hash,
-    'line_items':[{'sku':'SKU-BOOK-001','quantity':1}]}
+l3_checkout={'vct':'example.checkout.mandate','checkout_jwt':checkout_jwt,
+    'checkout_hash':transaction_hash,'line_items':[{'sku':'SKU-BOOK-001','quantity':1}]}
 
 # L3: terminal KB-SD-JWT, so typ is "kb+sd-jwt".
 def final(l2_presentation, audience, payload, salt):
     d, dh=array_disclosure(salt,payload)
     pl={'iat':NOW,'exp':NOW+300,'nonce':'agent-'+salt,'aud':audience,'sd_hash':sd_hash(l2_presentation),
-        '_sd_alg':'sha-256','delegate_payload':[dh]}
+        '_sd_alg':'sha-256','delegate_payload':[array_digest(dh)]}
     jwt=sign({'alg':'ES256','typ':'kb+sd-jwt','kid':'agent-key-1'},pl,AGENT)
     return jwt,d,pl
 l3a,l3a_d,l3a_pl=final(l2_for_network,'https://network.example.test',l3_payment,'network')
@@ -113,12 +120,20 @@ def verify_disclosure(encoded, digest_expected):
     assert digest(encoded.encode('ascii'))==digest_expected
     return json.loads(un64(encoded))
 
+def array_element_digest(element):
+    # Every delegate_payload entry must be an Array Disclosure digest object,
+    # not a bare digest string.
+    assert isinstance(element, dict) and list(element)==['...'], element
+    assert isinstance(element['...'], str)
+    return element['...']
+
 def verify_all():
     p1=check(l1,verify_key(ISSUER),'sd+jwt')
     assert email_hash in p1['_sd'];verify_disclosure(email_d,email_hash)
     p2=check(l2,verify_key(HOLDER),'kb-sd-jwt+kb')
     assert p1['cnf']['jwk']==jwk(HOLDER)
     assert p2['sd_hash']==sd_hash(l1_present)
+    assert array_element_digest(p2['delegate_payload'][0])==l2_dp_hash
     dp=verify_disclosure(l2_dp,l2_dp_hash)[1]
     assert dp['cnf']['jwk']==jwk(AGENT)
     assert pay_hash in dp['_sd'] and checkout_hash in dp['_sd']
@@ -129,8 +144,10 @@ def verify_all():
     assert pa['aud']=='https://network.example.test' and pb['aud']=='https://merchant.example.test'
     assert pa['sd_hash']==sd_hash(l2_for_network)
     assert pb['sd_hash']==sd_hash(l2_for_merchant)
-    assert verify_disclosure(l3a_d,pa['delegate_payload'][0])[1]['transaction_id']==transaction_hash
-    assert verify_disclosure(l3b_d,pb['delegate_payload'][0])[1]['checkout_hash']==transaction_hash
+    assert verify_disclosure(
+        l3a_d,array_element_digest(pa['delegate_payload'][0]))[1]['transaction_id']==transaction_hash
+    assert verify_disclosure(
+        l3b_d,array_element_digest(pb['delegate_payload'][0]))[1]['checkout_hash']==transaction_hash
     merchant_checkout=check(checkout_jwt,verify_key(MERCHANT),'JWT')
     assert merchant_checkout['currency']=='JPY'
     assert l3_payment['payment_amount']['amount']<=payment['payment_amount']['max_amount']
@@ -159,16 +176,19 @@ def disclosures_md(items):
                    f'{json.dumps(contents, indent=2, ensure_ascii=False)}\n```\n')
     return '\n'.join(out)
 
+write_json('sd_jwt_header.json', decode(l1)[0])
 write_json('sd_jwt_payload.json', l1_payload)
 write('issuer_disclosures.md', disclosures_md([(email_d,email_hash)]))
 write('sd_jwt_issuance.txt', wrap(l1_present))
 
+write_json('kb_sd_jwt_header.json', decode(l2)[0])
 write_json('kb_sd_jwt_payload.json', l2_payload)
 write_json('delegate_payload.json', l2_delegate)
 write('delegate_disclosures.md', disclosures_md(
     [(l2_dp,l2_dp_hash),(pay_d,pay_hash),(checkout_d,checkout_hash)]))
 write('dsd_jwt_delegation.txt', wrap(holder_to_agent))
 
+write_json('presentation_kb_header.json', decode(l3a)[0])
 write_json('presentation_payment_kb_payload.json', l3a_pl)
 write_json('presentation_payment_delegate_payload.json', l3_payment)
 write('presentation_payment.txt', wrap(network))

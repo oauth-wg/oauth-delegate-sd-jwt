@@ -6,6 +6,8 @@
   "sd_hash": "9vCwMcNr8K2eZ-vrjhQN9I_jR-Vmtu0FhDEF1T3kfcs",
   "_sd_alg": "sha-256",
   "delegate_payload": [
-    "wSDiixEiiUJftWeBNAwo3nDjfHBss_qUTsFpD--O-0Y"
+    {
+      "...": "RgUgNYLKYnEY4jNXn29W0cxxc3TVTXaqNj-iToQLQIg"
+    }
   ]
 }
