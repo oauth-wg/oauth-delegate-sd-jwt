@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-15T00:26:57.087534+00:00",
+  "timestamp": "2026-11-17T00:25:04.775610+00:00",
   "repo": "oauth-wg/oauth-delegate-sd-jwt",
   "labels": [
     {
@@ -173,7 +173,7 @@
       "labels": [],
       "body": "From call for adoption: Cliff Singletary: \"Section 8.2 lets an Issuer or Holder put constraints in \u201cvisible claims,\u201d but nothing in Section 6 requires the verifier to check that each Delegate Payload stays within the constraints of the link that issued it. Narrowing-only across the chain should be a verifier requirement rather than a policy option, or the chain carries attribution but not bounded authority.\"",
       "createdAt": "2026-10-13T11:43:56Z",
-      "updatedAt": "2026-11-14T00:26:19Z",
+      "updatedAt": "2026-11-16T18:31:18Z",
       "closedAt": null,
       "comments": [
         {
@@ -182,6 +182,13 @@
           "body": "Section 6 explains how to verify a delegation chain, but it doesn't say how to check that a later delegation stays within the original restrictions.\n\nFor example, a person authorizes purchases up to $100. The holder then delegates with a $150 limit. The delegate presents the chain for a $125 purchase. Assuming all other checks pass, the signatures and links can verify even though the later limit exceeds the original permission.\n\nThere are two possible rules:\n\n1. Reject the chain because the later delegation exceeds the original limit.\n2. Accept the chain but enforce the lowest limit, so the $125 purchase is refused.\n\nBoth prevent the $125 purchase, but they differ for a $75 purchase. The first still rejects the chain, while the second permits it if all other conditions are satisfied.\n\nCould the draft specify which behavior verifiers should follow? It would also help to define what happens when a later delegation omits a restriction or when a verifier cannot interpret one. Different restrictions, such as spending limits, audiences and expiry times, may need different comparison rules.\n",
           "createdAt": "2026-11-14T00:26:19Z",
           "updatedAt": "2026-11-14T00:26:19Z"
+        },
+        {
+          "author": "GarethCOliver",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, that's a good question. \n\nI think it'd be good practice to disallow delegation policies that would expand scope (it's error prone, and opens up problems if some verifier is not correctly checking the full chain)\n\nI'm more torn on requiring rejection the Verifier side, like in your example: the $75 is within the limit of the chain, even though there was a bad delegation in the middle. It makes the verifier's code a lot easier to just evaluate the action vs all of the steps, even if it may be more correct to also check that each delegated constraint was narrowing. ",
+          "createdAt": "2026-11-16T18:31:18Z",
+          "updatedAt": "2026-11-16T18:31:18Z"
         }
       ]
     },
