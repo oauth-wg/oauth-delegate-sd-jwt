@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-17T00:25:04.775610+00:00",
+  "timestamp": "2026-11-19T00:25:05.287332+00:00",
   "repo": "oauth-wg/oauth-delegate-sd-jwt",
   "labels": [
     {
@@ -173,7 +173,7 @@
       "labels": [],
       "body": "From call for adoption: Cliff Singletary: \"Section 8.2 lets an Issuer or Holder put constraints in \u201cvisible claims,\u201d but nothing in Section 6 requires the verifier to check that each Delegate Payload stays within the constraints of the link that issued it. Narrowing-only across the chain should be a verifier requirement rather than a policy option, or the chain carries attribution but not bounded authority.\"",
       "createdAt": "2026-10-13T11:43:56Z",
-      "updatedAt": "2026-11-16T18:31:18Z",
+      "updatedAt": "2026-11-17T03:30:10Z",
       "closedAt": null,
       "comments": [
         {
@@ -189,6 +189,13 @@
           "body": "Yeah, that's a good question. \n\nI think it'd be good practice to disallow delegation policies that would expand scope (it's error prone, and opens up problems if some verifier is not correctly checking the full chain)\n\nI'm more torn on requiring rejection the Verifier side, like in your example: the $75 is within the limit of the chain, even though there was a bad delegation in the middle. It makes the verifier's code a lot easier to just evaluate the action vs all of the steps, even if it may be more correct to also check that each delegated constraint was narrowing. ",
           "createdAt": "2026-11-16T18:31:18Z",
           "updatedAt": "2026-11-16T18:31:18Z"
+        },
+        {
+          "author": "aeoess",
+          "authorAssociation": "NONE",
+          "body": "@GarethCOliver I'd separate the rule against issuing a wider delegation from the verifier's decision on an action.\n\nThe verifier should check the action against every applicable constraint in the chain. A $100 limit followed by a $150 limit would still allow a $75 purchase but reject a $125 purchase.\n\nThat prevents the extra authority from being exercised, but it doesn't reject the widened delegation itself. If that's required, Section 6 should say so separately.\n\nThe verifier also needs to understand every applicable constraint before approving an action. Limits such as total spending need external state, since one presentation cannot establish how much has already been spent.\n\nI can contribute test vectors for these cases if useful.\n",
+          "createdAt": "2026-11-17T03:30:10Z",
+          "updatedAt": "2026-11-17T03:30:10Z"
         }
       ]
     },
@@ -253,6 +260,22 @@
       "body": "We should define the general way we want to deal with policies in this document. We need to decide how far we want to define policies and their extension point / structure in this document.\n\nInitial gut feeling would be to clearly define the security-critical policies (scoped to SD-JWT itself and the delegation process) and leave any domain-specific policies to an extension point and external work.",
       "createdAt": "2026-10-30T13:37:53Z",
       "updatedAt": "2026-10-30T13:37:53Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDORer75M8AAAABgWPxLA",
+      "title": "issuer_jwt_hash leaves Issuer Disclosures unbound in the final presentation",
+      "url": "https://github.com/oauth-wg/oauth-delegate-sd-jwt/issues/16",
+      "state": "OPEN",
+      "author": "kanywst",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "With `issuer_jwt_hash`, nothing in a dSD-JWT+KB covers the Issuer Disclosures. The KB-SD-JWT hashes only the Issuer-signed JWT, and the final KB-JWT `sd_hash` covers only the final KB-SD-JWT+KB and its disclosures (Section 6 step 5.3). So any party handling the finished presentation, not just the Delegate Holder, can drop Issuer Disclosures and it still verifies.\n\nIn RFC 9901 the KB-JWT fixes the set of disclosures presented. Computing the final `sd_hash` over the whole presentation would keep that.\n",
+      "createdAt": "2026-11-18T11:08:17Z",
+      "updatedAt": "2026-11-18T11:08:17Z",
       "closedAt": null,
       "comments": []
     }
